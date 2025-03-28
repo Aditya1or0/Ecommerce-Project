@@ -1,11 +1,11 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  removeFromCart,
-  clearCart,
-  updateCartQuantity,
-} from "../redux/CartSlice";
 import { Link } from "react-router-dom";
+import {
+  clearCart,
+  removeFromCart,
+  updateCartQuantity,
+} from "../redux/cartSlice";
 
 const Cart: React.FC = () => {
   const dispatch = useDispatch();
@@ -41,7 +41,9 @@ const Cart: React.FC = () => {
 
   return (
     <div className="container mx-auto my-10">
-      <h1 className="text-3xl font-bold text-center mb-8">Your Cart</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">
+        Your <span className="text-cyan-600">Cart</span>
+      </h1>
       <div className="space-y-4">
         {cartItems.map((item: any) => (
           <div

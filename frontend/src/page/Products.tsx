@@ -1,96 +1,102 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useCallback, useEffect, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
-import { setProducts } from "../redux/productSlice"
-import ProductCard from "../components/ProductCard"
-import { Search } from "lucide-react"
-import { api } from "../axios/util"
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setProducts } from "../redux/productSlice";
+import ProductCard from "../components/ProductCard";
+import { Search } from "lucide-react";
+import { api } from "../axios/util";
 
 const Products: React.FC = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const products = useSelector((state: any) => state.products.products)
+  const products = useSelector((state: any) => state.products.products);
 
-  const [searchQuery, setSearchQuery] = useState<string>("")
-  const [currentPage, setCurrentPage] = useState<number>(1)
-  const [selectedFilter, setSelectedFilter] = useState<string>("")
-  const [productsPerPage] = useState<number>(8)
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [selectedFilter, setSelectedFilter] = useState<string>("");
+  const [productsPerPage] = useState<number>(8);
 
   const fetchData = async () => {
     try {
-      const response = await api.get("/")
-      dispatch(setProducts(response.data))
+      const response = await api.get("/");
+      dispatch(setProducts(response.data));
     } catch (error) {
-      console.error("Error fetching data", error)
+      console.error("Error fetching data", error);
     }
-  }
+  };
 
   const handleFilterChange = (filter: string) => {
     // If clicking the same filter, toggle it off
     if (selectedFilter === filter) {
-      setSelectedFilter("")
+      setSelectedFilter("");
     } else {
-      setSelectedFilter(filter)
+      setSelectedFilter(filter);
     }
     // Reset to first page when changing filters
-    setCurrentPage(1)
-  }
+    setCurrentPage(1);
+  };
 
   useEffect(() => {
-    fetchData()
-  }, [dispatch])
+    fetchData();
+  }, [dispatch]);
 
   // Debounce the search query
-  const [debouncedQuery, setDebouncedQuery] = useState<string>("")
+  const [debouncedQuery, setDebouncedQuery] = useState<string>("");
 
   //debouncing logic
 
   const debouncedSearch = useCallback(() => {
     const handler = setTimeout(() => {
-      setDebouncedQuery(searchQuery)
-    }, 500)
+      setDebouncedQuery(searchQuery);
+    }, 500);
 
     return () => {
-      clearTimeout(handler)
-    }
-  }, [searchQuery])
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
 
   useEffect(() => {
-    const cleanup = debouncedSearch()
-    return cleanup
-  }, [debouncedSearch])
+    const cleanup = debouncedSearch();
+    return cleanup;
+  }, [debouncedSearch]);
 
   // Filter products and debouncing
   // Filter products by both search query and category
   const filteredProducts = products.filter((product: any) => {
     // Search filter
-    const matchesSearch = product.title.toLowerCase().includes(debouncedQuery.toLowerCase())
+    const matchesSearch = product.title
+      .toLowerCase()
+      .includes(debouncedQuery.toLowerCase());
 
     // Category filter
-    let matchesCategory = true
+    let matchesCategory = true;
     if (selectedFilter) {
       // Map UI filter names to API category names
       const categoryMap: Record<string, string> = {
         men: "men's clothing",
         women: "women's clothing",
         jewelry: "jewelery",
-      }
+        others: "others",
+      };
 
-      matchesCategory = product.category === categoryMap[selectedFilter]
+      matchesCategory = product.category === categoryMap[selectedFilter];
     }
 
-    return matchesSearch && matchesCategory
-  })
+    return matchesSearch && matchesCategory;
+  });
 
-  const indexOfLastProduct = currentPage * productsPerPage
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage
-  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct)
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
 
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -107,20 +113,27 @@ const Products: React.FC = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full p-3 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
         />
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+        <Search
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          size={18}
+        />
       </div>
 
       {/*Filter*/}
 
       <div className="flex flex-wrap gap-4 items-center py-4 px-6 mb-6">
         {/* Filter Title */}
-        <span className="font-semibold text-lg w-full sm:w-auto">Filter by:</span>
+        <span className="font-semibold text-lg w-full sm:w-auto">
+          Filter by:
+        </span>
 
         {/* Filter Buttons */}
         <button
           onClick={() => handleFilterChange("men")}
           className={`px-4 py-2 rounded-lg border border-gray-300 font-medium 
-      ${selectedFilter === "men" ? "bg-sky-600 text-white" : "hover:bg-sky-100"}`}
+      ${
+        selectedFilter === "men" ? "bg-sky-600 text-white" : "hover:bg-sky-100"
+      }`}
         >
           Men
         </button>
@@ -128,7 +141,11 @@ const Products: React.FC = () => {
         <button
           onClick={() => handleFilterChange("women")}
           className={`px-4 py-2 rounded-lg border border-gray-300 font-medium 
-      ${selectedFilter === "women" ? "bg-sky-600 text-white" : "hover:bg-sky-100"}`}
+      ${
+        selectedFilter === "women"
+          ? "bg-sky-600 text-white"
+          : "hover:bg-sky-100"
+      }`}
         >
           Women
         </button>
@@ -136,15 +153,30 @@ const Products: React.FC = () => {
         <button
           onClick={() => handleFilterChange("jewelry")}
           className={`px-4 py-2 rounded-lg border border-gray-300 font-medium 
-      ${selectedFilter === "jewelry" ? "bg-sky-600 text-white" : "hover:bg-sky-100"}`}
+      ${
+        selectedFilter === "jewelry"
+          ? "bg-sky-600 text-white"
+          : "hover:bg-sky-100"
+      }`}
         >
           Jewelry
+        </button>
+        <button
+          onClick={() => handleFilterChange("others")}
+          className={`px-4 py-2 rounded-lg border border-gray-300 font-medium 
+      ${
+        selectedFilter === "others"
+          ? "bg-sky-600 text-white"
+          : "hover:bg-sky-100"
+      }`}
+        >
+          Others
         </button>
 
         <button
           onClick={() => {
-            setSelectedFilter("")
-            setCurrentPage(1)
+            setSelectedFilter("");
+            setCurrentPage(1);
           }}
           className="px-4 py-2 rounded-lg border border-gray-300 font-medium hover:bg-red-100 text-gray-700"
         >
@@ -162,7 +194,9 @@ const Products: React.FC = () => {
         </div>
       ) : (
         <div className="text-center py-10">
-          <p className="text-xl text-gray-600">No products found matching your search.</p>
+          <p className="text-xl text-gray-600">
+            No products found matching your search.
+          </p>
         </div>
       )}
 
@@ -178,21 +212,29 @@ const Products: React.FC = () => {
             </button>
 
             <div className="flex mx-2">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
-                <button
-                  key={number}
-                  onClick={() => paginate(number)}
-                  className={`px-4 py-2 mx-1 rounded-md ${
-                    currentPage === number ? "bg-cyan-500 text-white" : "bg-gray-200 hover:bg-gray-300"
-                  }`}
-                >
-                  {number}
-                </button>
-              ))}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (number) => (
+                  <button
+                    key={number}
+                    onClick={() => paginate(number)}
+                    className={`px-4 py-2 mx-1 rounded-md ${
+                      currentPage === number
+                        ? "bg-cyan-500 text-white"
+                        : "bg-gray-200 hover:bg-gray-300"
+                    }`}
+                  >
+                    {number}
+                  </button>
+                )
+              )}
             </div>
 
             <button
-              onClick={() => paginate(currentPage < totalPages ? currentPage + 1 : totalPages)}
+              onClick={() =>
+                paginate(
+                  currentPage < totalPages ? currentPage + 1 : totalPages
+                )
+              }
               disabled={currentPage === totalPages}
               className="px-4 py-2 mx-1 rounded-md bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -202,8 +244,7 @@ const Products: React.FC = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Products
-
+export default Products;

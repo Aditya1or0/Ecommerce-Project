@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { values } from "../assets/assets";
+import { values } from "../assets/assets"; // Assuming values contains a currency symbol like "$"
+import { api } from "../axios/util";
+import { useDispatch } from "react-redux";
+import { setProducts } from "../redux/productSlice"; // Import the action to update Redux store
 
 interface Rating {
   rate: number;
@@ -8,6 +11,7 @@ interface Rating {
 }
 
 interface Product {
+  ratingCount: number;
   id: number;
   title: string;
   price: number;
@@ -18,32 +22,33 @@ interface Product {
 }
 
 const BestProduct: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const dispatch = useDispatch();
+  const [products, setProductsState] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
-  // Fetch products
+  // Fetch products from the backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("https://fakestoreapi.com/products");
-        const data: Product[] = await response.json();
-        setProducts(data);
+        const response = await api.get("/");
+        setProductsState(response.data);
+        dispatch(setProducts(response.data));
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
 
     fetchProducts();
-  }, []);
+  }, [dispatch]);
 
-  // Filter products with rating above 4
+  // Filter products based on rating above 4 after products are fetched
   useEffect(() => {
     setFilteredProducts(products.filter((product) => product.rating.rate > 4));
-  }, [products]);
+  }, [products]); // Re-run the filter logic when 'products' state changes
 
   return (
     <>
-      <h1 className=" text-center mt-10 mb-4 font-bold text-gray-700 text-3xl">
+      <h1 className="text-center mt-10 mb-4 font-bold text-gray-700 text-3xl">
         Best <span className="text-cyan-600 ">Products</span>
       </h1>
       <p className="text-center text-gray-600 text-md">
@@ -73,8 +78,8 @@ const BestProduct: React.FC = () => {
                     <span className="font-semibold mr-1">Rating:</span>
                     <span className="font-bold mr-2">
                       {product.rating.rate}
-                    </span>{" "}
-                    Total Reviews: {product.rating.count}
+                    </span>
+                    Total Reviews: {product.ratingCount}
                   </p>
                 </div>
               </div>

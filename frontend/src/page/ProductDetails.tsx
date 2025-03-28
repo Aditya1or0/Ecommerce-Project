@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { api } from '../axios/util';
-import { addToCart } from '../redux/CartSlice';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { api } from "../axios/util";
+import { addToCart } from "../redux/cartSlice";
+import NewsLetterBox from "../components/NewsLetterBox";
 
 const ProductDetails: React.FC = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const { id } = useParams();
   const [product, setProduct] = useState<any>(null);
   const dispatch = useDispatch();
@@ -16,7 +17,7 @@ const ProductDetails: React.FC = () => {
         const response = await api.get(`/${id}`);
         setProduct(response.data);
       } catch (error) {
-        console.error('Error fetching product details', error);
+        console.error("Error fetching product details", error);
       }
     };
 
@@ -27,23 +28,26 @@ const ProductDetails: React.FC = () => {
 
   const handleAddToCart = () => {
     if (product) {
-     
       dispatch(
         addToCart({
           id: product.id,
           title: product.title,
           price: product.price,
           image: product.image,
-          quantity: 0
+          quantity: 0,
         })
       );
-      
-      navigate('/cart');
+
+      navigate("/cart");
     }
   };
 
   if (!product) {
-    return <div className="text-3xl flex justify-center items-center h-screen text-cyan-600">Loading...</div>;
+    return (
+      <div className="text-3xl flex justify-center items-center h-screen text-cyan-600">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -52,13 +56,15 @@ const ProductDetails: React.FC = () => {
         <div>
           <img
             className="w-[200px] sm:w-[250px] object-cover mx-auto md:mx-0"
-            src={product.image || '/placeholder.svg'}
+            src={product.image || "/placeholder.svg"}
             alt={product.title}
           />
         </div>
 
         <div className="flex flex-col max-w-2xl">
-          <h1 className="text-3xl font-bold ml-10 mt-10 mb-4">{product.title}</h1>
+          <h1 className="text-3xl font-bold ml-10 mt-10 mb-4">
+            {product.title}
+          </h1>
           <p className="m-4 ml-10 text-md">{product.description}</p>
           <p className="text-xl font-bold ml-10">
             <span className="text-gray-700">Price: </span>₹{product.price}
@@ -70,6 +76,9 @@ const ProductDetails: React.FC = () => {
             Add to Cart
           </button>
         </div>
+      </div>
+      <div className="mt-20 hidden sm:block">
+        <NewsLetterBox />
       </div>
     </div>
   );

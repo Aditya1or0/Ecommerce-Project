@@ -6,4 +6,7 @@ export class PrismaService extends PrismaClient {
   constructor() {
     super();
   }
+  // prisma = new PrismaClient({
+  //   log: ['query', 'info', 'warn', 'error'],
+  // });
 }

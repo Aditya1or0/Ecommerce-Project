@@ -7,15 +7,12 @@ import {
   Delete,
   Put,
   Query,
-  HttpException,
-  HttpStatus,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Product } from '@prisma/client';
 
-// In ProductsController
-@Controller('products') // This will handle requests to /products
+@Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
@@ -29,21 +26,19 @@ export class ProductsController {
   @Get('search')
   async search(
     @Query('q') query: string,
-    @Query('category') category: string, // Accept category as query param
+    @Query('category') category: string,
   ): Promise<Product[]> {
     return this.productsService.search(query, category);
   }
 
   // GET endpoint for paginated products
-  // @Get('paginated')
-  // async findAllPaginated(
-  //   @Query('page') page: number = 1,
-  //   @Query('limit') limit: number = 8,
-  //   @Query('q') query: string = '',
-  //   @Query('category') category: string | null = null,
-  // ): Promise<{ data: Product[]; total: number }> {
-  //   return this.productsService.findAllPaginated(page, limit, query, category);
-  // }
+  @Get('paginated')
+  async getPaginatedProducts(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ) {
+    return this.productsService.getPaginatedProducts(page, limit);
+  }
 
   // GET endpoint to fetch all products
   @Get()

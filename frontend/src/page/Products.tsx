@@ -1,3 +1,5 @@
+"use client";
+
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,11 +16,12 @@ const Products: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedFilter, setSelectedFilter] = useState<string>("");
   const [productsPerPage] = useState<number>(8);
+  const [, setTotalProducts] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [_, setIsSearching] = useState<boolean>(false);
 
   const [debouncedQuery, setDebouncedQuery] = useState<string>("");
 
-  // Handle search debouncing
   const debouncedSearch = useCallback(() => {
     const handler = setTimeout(() => {
       setDebouncedQuery(searchQuery);
@@ -33,26 +36,53 @@ const Products: React.FC = () => {
     return cleanup;
   }, [debouncedSearch]);
 
+  const fetchTotalProducts = async () => {
+    try {
+      const response = await api.get("/");
+      setTotalProducts(response.data.length);
+      setTotalPages(Math.ceil(response.data.length / productsPerPage));
+    } catch (error) {
+      console.error("Error fetching total products:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTotalProducts();
+  }, [productsPerPage]);
+
   const fetchData = async () => {
     try {
-      const category = selectedFilter
-        ? {
-            men: "men's clothing",
-            women: "women's clothing",
-            jewelry: "jewelery",
-            others: "others",
-          }[selectedFilter]
-        : null;
+      if (debouncedQuery || selectedFilter) {
+        setIsSearching(true);
+        const category = selectedFilter
+          ? {
+              men: "men's clothing",
+              women: "women's clothing",
+              jewelry: "jewelery",
+              others: "others",
+            }[selectedFilter]
+          : null;
 
-      const response = await api.get(`/search`, {
-        params: {
-          q: debouncedQuery,
-          category,
-        },
-      });
+        const response = await api.get(`/search`, {
+          params: {
+            q: debouncedQuery,
+            category,
+          },
+        });
 
-      dispatch(setProducts(response.data));
-      setTotalPages(Math.ceil(response.data.length / productsPerPage));
+        dispatch(setProducts(response.data));
+        setTotalPages(Math.ceil(response.data.length / productsPerPage));
+      } else {
+        setIsSearching(false);
+        const response = await api.get("/paginated", {
+          params: {
+            page: currentPage,
+            limit: productsPerPage,
+          },
+        });
+
+        dispatch(setProducts(response.data));
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -130,7 +160,7 @@ const Products: React.FC = () => {
       {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product: any, index: number) => (
-            <ProductCard key={index} product={product} />
+            <ProductCard key={product.id || index} product={product} />
           ))}
         </div>
       ) : (

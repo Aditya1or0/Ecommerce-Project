@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Product } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -43,7 +43,7 @@ export class ProductsService {
 
   // In ProductsService
   async search(query: string, category?: string): Promise<Product[]> {
-    console.log('Search Query:', query, 'Category:', category);
+    // console.log('Search Query:', query, 'Category:', category);
 
     return this.prisma.product.findMany({
       where: {
@@ -55,49 +55,21 @@ export class ProductsService {
               { category: { contains: query, mode: 'insensitive' } },
             ],
           },
-          category ? { category: category } : {}, // Only apply the category filter if provided
+          category ? { category: category } : {},
         ],
       },
     });
   }
 
-  // Update findAllPaginated to also handle search
-  // async findAllPaginated(
-  //   page: number,
-  //   limit: number,
-  //   query: string = '',
-  //   category: string | null = null,
-  // ): Promise<{ data: Product[]; total: number }> {
-  //   const skip = (page - 1) * limit; // Calculate how many items to skip
+  // Get paginated products
+  async getPaginatedProducts(page: number, limit: number): Promise<Product[]> {
+    const skip = (page - 1) * limit;
 
-  //   const whereCondition: any = {};
-  //   if (query) {
-  //     whereCondition.OR = [
-  //       { title: { contains: query, mode: 'insensitive' } },
-  //       { description: { contains: query, mode: 'insensitive' } },
-  //       { category: { contains: query, mode: 'insensitive' } },
-  //     ];
-  //   }
+    const parsedLimit = parseInt(limit.toString(), 10);
 
-  //   if (category) {
-  //     whereCondition.category = category;
-  //   }
-
-  //   // Fetch the total count of products based on filters
-  //   const total = await this.prisma.product.count({
-  //     where: whereCondition,
-  //   });
-
-  //   // Fetch paginated data
-  //   const data = await this.prisma.product.findMany({
-  //     skip,
-  //     take: limit,
-  //     where: whereCondition,
-  //     orderBy: {
-  //       id: 'asc', // Sort by title (optional)
-  //     },
-  //   });
-
-  //   return { data, total };
-  // }
+    return this.prisma.product.findMany({
+      skip,
+      take: parsedLimit,
+    });
+  }
 }

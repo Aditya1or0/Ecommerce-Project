@@ -16,10 +16,9 @@ const Products: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedFilter, setSelectedFilter] = useState<string>("");
   const [productsPerPage] = useState<number>(8);
-  const [, setTotalProducts] = useState<number>(0);
+  const [totalProducts, setTotalProducts] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [_, setIsSearching] = useState<boolean>(false);
-
   const [debouncedQuery, setDebouncedQuery] = useState<string>("");
 
   const debouncedSearch = useCallback(() => {
@@ -36,16 +35,6 @@ const Products: React.FC = () => {
     return cleanup;
   }, [debouncedSearch]);
 
-  const fetchTotalProducts = async () => {
-    try {
-      const response = await api.get("/");
-      setTotalProducts(response.data.length);
-      setTotalPages(Math.ceil(response.data.length / productsPerPage));
-    } catch (error) {
-      console.error("Error fetching total products:", error);
-    }
-  };
-
   const fetchData = async () => {
     try {
       if (debouncedQuery || selectedFilter) {
@@ -57,17 +46,20 @@ const Products: React.FC = () => {
               jewelry: "jewelery",
               others: "others",
             }[selectedFilter]
-          : null;
+          : "";
 
         const response = await api.get(`/search`, {
           params: {
             q: debouncedQuery,
             category,
+            page: currentPage,
+            limit: productsPerPage,
           },
         });
 
-        dispatch(setProducts(response.data));
-        setTotalPages(Math.ceil(response.data.length / productsPerPage));
+        dispatch(setProducts(response.data.data));
+        setTotalProducts(response.data.total);
+        setTotalPages(Math.ceil(response.data.total / productsPerPage));
       } else {
         setIsSearching(false);
         const response = await api.get("/paginated", {
@@ -77,8 +69,9 @@ const Products: React.FC = () => {
           },
         });
 
-        dispatch(setProducts(response.data));
-        fetchTotalProducts(); // Refresh total products when "All" is selected
+        dispatch(setProducts(response.data.data));
+        setTotalProducts(response.data.total);
+        setTotalPages(Math.ceil(response.data.total / productsPerPage));
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -87,7 +80,7 @@ const Products: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [currentPage, debouncedQuery, selectedFilter, dispatch]);
+  }, [currentPage, debouncedQuery, selectedFilter]);
 
   const handleFilterChange = (filter: string) => {
     if (selectedFilter === filter) {
@@ -110,13 +103,15 @@ const Products: React.FC = () => {
         Our <span className="ml-2 text-cyan-600">Products</span>
       </h1>
 
-      {/* Search Bar */}
       <div className="mb-6 max-w-md mx-auto relative">
         <input
           type="text"
           placeholder="Search products..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setCurrentPage(1);
+          }}
           className="w-full p-3 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
         />
         <Search
@@ -125,7 +120,6 @@ const Products: React.FC = () => {
         />
       </div>
 
-      {/* Filter Buttons */}
       <div className="flex flex-wrap gap-4 items-center py-4 px-6 mb-6">
         <span className="font-semibold text-lg w-full sm:w-auto">
           Filter by:
@@ -134,9 +128,10 @@ const Products: React.FC = () => {
           onClick={() => {
             setSelectedFilter("");
             setCurrentPage(1);
-            fetchTotalProducts();
           }}
-          className="px-4 py-2 rounded-lg border border-gray-300 font-medium hover:bg-red-100 text-gray-700"
+          className={`px-4 py-2 rounded-lg border border-gray-300 font-medium ${
+            !selectedFilter ? "bg-sky-600 text-white" : "hover:bg-sky-100"
+          }`}
         >
           All
         </button>
@@ -156,11 +151,22 @@ const Products: React.FC = () => {
       </div>
 
       {products.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product: any, index: number) => (
-            <ProductCard key={product.id || index} product={product} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {products.map((product: any, index: number) => (
+              <ProductCard key={product.id || index} product={product} />
+            ))}
+          </div>
+          <div className="text-center text-gray-600 mt-4">
+            Showing{" "}
+            <span className="text-cyan-600 font-bold">
+              {(currentPage - 1) * productsPerPage + 1}
+            </span>{" "}
+            to {Math.min(currentPage * productsPerPage, totalProducts)} of{" "}
+            <span className="text-cyan-600 font-bold"> {totalProducts}</span>{" "}
+            Total products
+          </div>
+        </>
       ) : (
         <div className="text-center py-10">
           <p className="text-xl text-gray-600">

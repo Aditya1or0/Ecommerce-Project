@@ -1,3 +1,5 @@
+"use client";
+
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -44,10 +46,6 @@ const Products: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchTotalProducts();
-  }, [productsPerPage]);
-
   const fetchData = async () => {
     try {
       if (debouncedQuery || selectedFilter) {
@@ -80,6 +78,7 @@ const Products: React.FC = () => {
         });
 
         dispatch(setProducts(response.data));
+        fetchTotalProducts(); // Refresh total products when "All" is selected
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -131,6 +130,16 @@ const Products: React.FC = () => {
         <span className="font-semibold text-lg w-full sm:w-auto">
           Filter by:
         </span>
+        <button
+          onClick={() => {
+            setSelectedFilter("");
+            setCurrentPage(1);
+            fetchTotalProducts();
+          }}
+          className="px-4 py-2 rounded-lg border border-gray-300 font-medium hover:bg-red-100 text-gray-700"
+        >
+          All
+        </button>
         {["men", "women", "jewelry", "others"].map((filter) => (
           <button
             key={filter}
@@ -144,15 +153,6 @@ const Products: React.FC = () => {
             {filter.charAt(0).toUpperCase() + filter.slice(1)}
           </button>
         ))}
-        <button
-          onClick={() => {
-            setSelectedFilter("");
-            setCurrentPage(1);
-          }}
-          className="px-4 py-2 rounded-lg border border-gray-300 font-medium hover:bg-red-100 text-gray-700"
-        >
-          All
-        </button>
       </div>
 
       {products.length > 0 ? (

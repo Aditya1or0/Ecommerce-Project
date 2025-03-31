@@ -25,7 +25,6 @@ export class ProductsService {
       }))
       .map(({ rating, ...rest }) => rest);
 
-    console.log('data is: ', data);
     return this.prisma.product.createMany({
       data: data,
     });

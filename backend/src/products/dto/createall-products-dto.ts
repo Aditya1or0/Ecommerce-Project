@@ -1,23 +1,3 @@
-// interface Rating {
-//   rate: number;
-//   count: number;
-// }
-
-// interface Product {
-//   id: number;
-//   title: string;
-//   price: number;
-//   description: string;
-//   category: string;
-//   image: string;
-//   rating: Rating;
-// }
-
-// export interface AllProducts {
-//   rating: Rating;
-//   products: Product[];
-// }
-
 export interface AllProducts {
   id: number;
   title: string;

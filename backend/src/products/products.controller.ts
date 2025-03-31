@@ -11,6 +11,7 @@ import {
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Product } from '@prisma/client';
+import { AllProducts } from './dto/createall-products-dto';
 
 @Controller('products')
 export class ProductsController {
@@ -20,6 +21,11 @@ export class ProductsController {
   @Post()
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
+  }
+  @Post('all')
+  createAll(@Body() allProducts) {
+    console.log('All products are: ', allProducts);
+    return this.productsService.createAll(allProducts);
   }
 
   // GET endpoint to search for products

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Product } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-
+import { AllProducts } from './dto/createall-products-dto';
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
@@ -11,6 +11,23 @@ export class ProductsService {
   create(createProductDto: CreateProductDto) {
     return this.prisma.product.create({
       data: createProductDto,
+    });
+  }
+
+  createAll(allProducts) {
+    const data = allProducts
+      .map((product) => ({
+        ...product, // Spread the original product
+        ratingRate: product.rating.rate, // Add ratingRate from product.rating
+        ratingCount: product.rating.count, // Add ratingCount from product.rating
+        // Do not include the "rating" property
+        rating: undefined, // Explicitly set rating to undefined or just leave it out
+      }))
+      .map(({ rating, ...rest }) => rest);
+
+    console.log('data is: ', data);
+    return this.prisma.product.createMany({
+      data: data,
     });
   }
 
@@ -41,7 +58,7 @@ export class ProductsService {
     });
   }
 
-  // In ProductsService
+  // search for products
   async search(query: string, category?: string): Promise<Product[]> {
     // console.log('Search Query:', query, 'Category:', category);
 

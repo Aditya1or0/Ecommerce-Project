@@ -100,7 +100,10 @@ const Products: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 flex items-center justify-center">
-        Our <span className="ml-2 text-cyan-600">Products</span>
+        Our{" "}
+        <span className="ml-2 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+          Products
+        </span>
       </h1>
 
       <div className="mb-6 max-w-md mx-auto relative">

@@ -31,7 +31,7 @@ export class ProductsController {
     @Query('q') query: string,
     @Query('category') category: string,
     @Query('page') page = '1',
-    @Query('limit') limit = '10',
+    @Query('limit') limit = '4',
   ) {
     return this.productsService.search(
       query,
@@ -44,7 +44,7 @@ export class ProductsController {
   @Get('paginated')
   async getPaginatedProducts(
     @Query('page') page = '1',
-    @Query('limit') limit = '10',
+    @Query('limit') limit = '4',
   ) {
     return this.productsService.getPaginatedProducts(
       parseInt(page),

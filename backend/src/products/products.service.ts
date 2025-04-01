@@ -60,10 +60,12 @@ export class ProductsService {
     query: string,
     category: string,
     page = 1,
-    limit = 10,
+    limit = 4,
   ): Promise<{ data: Product[]; total: number }> {
     const skip = (page - 1) * limit;
-    const parsedLimit = parseInt(limit.toString(), 10);
+
+    const parsedLimit = 4;
+    // console.log('parsedLimit:', parsedLimit);
 
     const whereCondition: Prisma.ProductWhereInput = {
       AND: [
@@ -119,15 +121,15 @@ export class ProductsService {
   //  paginated products method
   async getPaginatedProducts(
     page = 1,
-    limit = 10,
+    limit = 4,
   ): Promise<{ data: Product[]; total: number }> {
     const skip = (page - 1) * limit;
-    const parsedLimit = parseInt(limit.toString(), 10);
+    // const parsedLimit = parseInt(limit.toString(), 4);
 
     const [data, total] = await Promise.all([
       this.prisma.product.findMany({
         skip,
-        take: parsedLimit,
+        take: 4,
       }),
       this.prisma.product.count(),
     ]);

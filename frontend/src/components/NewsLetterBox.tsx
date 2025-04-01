@@ -12,7 +12,9 @@ const NewsLetterBox: React.FC = () => {
     <div className="text-center my-10">
       <p className="font-bold  text-gray-700 text-3xl">
         Subscribe Now for Instant{" "}
-        <span className="text-cyan-600">Notifications!</span>
+        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+          Notifications!
+        </span>
       </p>
       <p className="text-gray-800 ml-10 text-md mt-3">
         Stay ahead of the game with our subscription service—get fast

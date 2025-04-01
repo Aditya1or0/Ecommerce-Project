@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { api } from "../axios/util";
 import { addToCart } from "../redux/cartSlice";
 import NewsLetterBox from "../components/NewsLetterBox";
+import { toast } from "react-toastify";
 
 const ProductDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ const ProductDetails: React.FC = () => {
           quantity: 0,
         })
       );
-
+      toast.success("Product added to cart!");
       navigate("/cart");
     }
   };

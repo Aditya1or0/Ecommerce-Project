@@ -27,7 +27,10 @@ const ProductList: React.FC = () => {
     <div>
       {" "}
       <h1 className="text-3xl font-bold mb-20 text-center">
-        Our <span className="text-cyan-600">Products</span>{" "}
+        Our{" "}
+        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+          Products
+        </span>{" "}
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-4">
         {products.slice(0, 8).map((product, index) => (

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { HttpException, HttpStatus } from '@nestjs/common'; // Importing HttpException and HttpStatus
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -11,19 +11,30 @@ export class AuthService {
     private prisma: PrismaService,
   ) {}
 
-  async validateUser(email: string, pass: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<any> {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    if (user && (await bcrypt.compare(pass, user.password))) {
+    if (user && (await bcrypt.compare(password, user.password))) {
       const { password, ...result } = user;
       return result;
     }
     return null;
   }
 
-  async login(user: any) {
+  async login(email: string, password: string) {
+    const user = await this.validateUser(email, password);
+
+    if (!user) {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    }
+
     const payload = { email: user.email, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
+      user: {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
     };
   }
 
@@ -34,13 +45,11 @@ export class AuthService {
     lastName?: string,
   ) {
     try {
-      // Check if the email already exists
       const existingUser = await this.prisma.user.findUnique({
         where: { email },
       });
 
       if (existingUser) {
-        // Throw an HTTP exception with a custom message and status code 400 (Bad Request)
         throw new HttpException(
           'Email is already taken',
           HttpStatus.BAD_REQUEST,
@@ -63,7 +72,6 @@ export class AuthService {
       const { password, ...result } = user;
       return result;
     } catch (error) {
-      // Handle any other errors (e.g. database errors, etc.)
       throw new HttpException(
         error.message || 'An error occurred during registration',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -71,6 +79,7 @@ export class AuthService {
     }
   }
 
+  //deleting user based on email
   async deleteUser(email: string) {
     try {
       const user = await this.prisma.user.findUnique({
@@ -89,5 +98,11 @@ export class AuthService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+  async logout() {
+    return {
+      message:
+        'Logged out successfully. Please delete your token on the client side.',
+    };
   }
 }

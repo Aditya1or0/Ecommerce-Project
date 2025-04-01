@@ -6,6 +6,7 @@ import {
   removeFromCart,
   updateCartQuantity,
 } from "../redux/cartSlice";
+import { toast } from "react-toastify";
 
 const Cart: React.FC = () => {
   const dispatch = useDispatch();
@@ -14,10 +15,12 @@ const Cart: React.FC = () => {
 
   const handleRemoveFromCart = (id: string) => {
     dispatch(removeFromCart(id));
+    toast.success("Product removed from cart!");
   };
 
   const handleClearCart = () => {
     dispatch(clearCart());
+    toast.success("Cart cleared!");
   };
 
   const handleIncreaseQuantity = (id: string) => {
@@ -42,7 +45,10 @@ const Cart: React.FC = () => {
   return (
     <div className="container mx-auto my-10">
       <h1 className="text-3xl font-bold text-center mb-8">
-        Your <span className="text-cyan-600">Cart</span>
+        Your{" "}
+        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+          Cart
+        </span>
       </h1>
       <div className="space-y-4">
         {cartItems.map((item: any) => (
@@ -75,7 +81,9 @@ const Cart: React.FC = () => {
               </div>
             </div>
             <button
-              onClick={() => handleRemoveFromCart(item.id)}
+              onClick={() => {
+                handleRemoveFromCart(item.id);
+              }}
               className="bg-red-800 text-white py-1 px-4 rounded hover:bg-red-600"
             >
               Remove
@@ -101,12 +109,12 @@ const Cart: React.FC = () => {
             )
             .toFixed(2)}
         </div>
-        <Link
-          to="/checkout"
-          className="bg-cyan-600 text-white py-2 px-6 rounded hover:bg-cyan-700"
+        <button
+          className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-2 px-6 rounded transition-all hover:opacity-90"
+          onClick={() => toast.success("Checkout successful!")}
         >
           Checkout
-        </Link>
+        </button>
       </div>
     </div>
   );

@@ -13,7 +13,7 @@ import Login from "./page/Login";
 
 const App: React.FC = () => {
   return (
-    <div className="flex flex-col min-h-screen px-4 sm:px-8 md:px-10 lg:px-22 bg-gradient-to-b from-teal-100/20 to-gray-100/30">
+    <div className="flex flex-col min-h-screen px-4 sm:px-8 md:px-10 lg:px-22 bg-gradient-to-b from-gray-100/50  to-teal-100/20">
       <ToastContainer theme="dark" position="bottom-right" autoClose={1000} />
       <Navbar />
 

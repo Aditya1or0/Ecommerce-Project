@@ -21,7 +21,7 @@ export default function Login() {
         Welcome to <span className="text-cyan-600 font-bold">ShopiFy</span>
       </h1>
       <div className="bg-white/80 p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-3xl font-semibold text-center text-gray-700">
+        <h2 className="text-3xl font-semibold text-center text-gray-700 underline">
           {isLogin ? "Login" : "Register"}
         </h2>
         <form onSubmit={onSubmitHandler} className="space-y-4 mt-6">

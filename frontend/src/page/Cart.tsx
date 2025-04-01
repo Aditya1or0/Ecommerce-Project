@@ -87,7 +87,7 @@ const Cart: React.FC = () => {
       <div className="flex justify-between items-center mt-6">
         <button
           onClick={handleClearCart}
-          className="bg-gray-300 text-gray-700 py-2 px-6 rounded hover:bg-gray-400"
+          className="bg-gray-300 text-gray-700 py-2 px-2 sm:px-6 rounded hover:bg-gray-400"
         >
           Clear Cart
         </button>

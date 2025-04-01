@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import logo from "../assets/logo.png";
+import { User } from "lucide-react";
 // import { useSelector } from 'react-redux';
 
 const Navbar: React.FC = () => {
@@ -84,6 +85,9 @@ const Navbar: React.FC = () => {
             >
               Login
             </NavLink>
+          </li>
+          <li>
+            <User />
           </li>
         </ul>
       </div>
@@ -170,6 +174,7 @@ const Navbar: React.FC = () => {
             <li>
               <NavLink
                 to="/login"
+                onClick={closeMobileMenu}
                 className={({ isActive }) =>
                   isActive
                     ? "font-semibold text-sky-600 border-b-2 border-sky-600"

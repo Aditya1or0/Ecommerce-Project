@@ -7,7 +7,7 @@ const About: React.FC = () => {
       <h1 className="font-bold text-gray-700 text-4xl sm:text-4xl mb-6">
         About <span className="text-cyan-600">Us</span>
       </h1>
-      <p className="text-lg leading-8 text-gray-600 max-w-4xl">
+      <p className="text-lg text-gray-600 max-w-4xl">
         Welcome to <span className="text-cyan-600 font-semibold">Shopify</span>,
         your ultimate eCommerce companion. Our platform is thoughtfully designed
         to empower businesses of all sizes. Whether you're selling physical
@@ -17,7 +17,7 @@ const About: React.FC = () => {
         suite of customizable features to transform your online storefront into
         a thriving business.
       </p>
-      <p className="text-lg leading-8 text-gray-600 max-w-4xl mt-4">
+      <p className="text-lg text-gray-600 max-w-4xl mt-4">
         At <span className="text-cyan-600 font-semibold">Shopify</span>, we’re
         more than just an eCommerce platform—we’re your partners in growth. From
         first-time entrepreneurs to seasoned business owners, we are here to
@@ -25,7 +25,7 @@ const About: React.FC = () => {
         shopping experience your customers will love. The power of eCommerce is
         in your hands—let’s build something remarkable together.
       </p>
-      <p className="text-lg leading-8 text-gray-600 max-w-4xl mt-8">
+      <p className="text-lg  text-gray-600 max-w-4xl mt-8">
         Our commitment goes beyond just providing tools; we believe in fostering
         creativity and innovation. With 24/7 customer support, a global network
         of partners, and regular updates to stay ahead of industry trends,{" "}

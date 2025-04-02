@@ -44,7 +44,7 @@ const Cart: React.FC = () => {
 
   return (
     <div className="container mx-auto my-10">
-      <h1 className="text-3xl font-bold text-center mb-8">
+      <h1 className="text-3xl text-gray-700 font-bold text-center mb-8">
         Your{" "}
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
           Cart

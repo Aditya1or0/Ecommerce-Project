@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -13,12 +13,77 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
 
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [formValid, setFormValid] = useState(false);
+
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state: RootState) => state.auth);
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      setEmailError("Email is required");
+      return false;
+    } else if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address");
+      return false;
+    }
+    setEmailError("");
+    return true;
+  };
+
+  const validatePassword = (password: string) => {
+    if (!password) {
+      setPasswordError("Password is required");
+      return false;
+    } else if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters long");
+      return false;
+    }
+    setPasswordError("");
+    return true;
+  };
+
+  // Validate form on input changes
+  useEffect(() => {
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = validatePassword(password);
+
+    let isFormValid = isEmailValid && isPasswordValid;
+
+    // If registration form, check first and last name
+    if (!isLogin) {
+      isFormValid =
+        isFormValid && firstName.trim() !== "" && lastName.trim() !== "";
+    }
+
+    setFormValid(isFormValid);
+  }, [email, password, firstName, lastName, isLogin]);
+
+  // Server-side validation function
+  const serverSideValidate = () => {
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = validatePassword(password);
+
+    // For registration, validate first and last names
+    if (!isLogin && (firstName.trim() === "" || lastName.trim() === "")) {
+      toast.error("First and last name are required");
+      return false;
+    }
+
+    return isEmailValid && isPasswordValid;
+  };
+
   const onSubmitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Server-side validation as a defense against HTML tampering
+    if (!serverSideValidate()) {
+      toast.error("Please check your inputs and try again");
+      return;
+    }
 
     try {
       if (isLogin) {
@@ -35,12 +100,12 @@ export default function Login() {
         setIsLogin(true);
       }
     } catch (err) {
-      toast.error(error || "Authentication failed");
+      toast.error(error);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex flex-col items-center justify-center ">
       <h1 className="text-4xl font-bold max-w-[300px] sm:max-w-[590px] mx-auto mt-[-70px] text-center mb-10 text-gray-700">
         Welcome to{" "}
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600 font-bold">
@@ -101,11 +166,19 @@ export default function Login() {
               type="email"
               id="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                validateEmail(e.target.value);
+              }}
+              className={`w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+                emailError ? "border-red-500" : ""
+              }`}
               placeholder="you@example.com"
               required
             />
+            {emailError && (
+              <p className="mt-1 text-sm text-red-600">{emailError}</p>
+            )}
           </div>
           <div>
             <label
@@ -118,17 +191,26 @@ export default function Login() {
               type="password"
               id="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              onChange={(e) => {
+                setPassword(e.target.value);
+                validatePassword(e.target.value);
+              }}
+              className={`w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+                passwordError ? "border-red-500" : ""
+              }`}
               placeholder="••••••••"
+              minLength={6}
               required
             />
+            {passwordError && (
+              <p className="mt-1 text-sm text-red-600">{passwordError}</p>
+            )}
           </div>
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !formValid}
             className={`w-full bg-cyan-600 text-white py-2 px-4 rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-colors ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
+              loading || !formValid ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             {loading ? "Processing..." : isLogin ? "Login" : "Register"}

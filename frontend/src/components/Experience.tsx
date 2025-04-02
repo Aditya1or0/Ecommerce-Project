@@ -12,7 +12,7 @@ const Experience: React.FC = () => {
       viewport={{ once: true }}
     >
       <motion.h1
-        className="text-3xl sm:text-4xl font-semibold mb-6 text-center text-gray-800"
+        className="text-3xl sm:text-4xl font-semibold mb-6 text-center text-gray-700"
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.8 }}

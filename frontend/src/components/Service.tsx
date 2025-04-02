@@ -41,7 +41,7 @@ const services: ServiceItem[] = [
 const Service: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-semibold text-center mb-8">
+      <h1 className="text-4xl text-gray-700 font-semibold text-center mb-8">
         Our{" "}
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
           Services

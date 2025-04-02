@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import Navbar from "./components/Navbar";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,9 +12,8 @@ import About from "./page/About";
 import Login from "./page/Login";
 import Dashboard from "./page/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { redirect } from "react-router-dom";
-
 import ErrorBoundary from "./components/ErrorBoundary";
+import Unprotected from "./components/UnprotectedRoute";
 
 const App: React.FC = () => {
   return (
@@ -23,8 +22,22 @@ const App: React.FC = () => {
       <Navbar />
       <ErrorBoundary>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Products />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products"
+            element={
+              <ProtectedRoute>
+                <Products />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/about" element={<About />} />
           <Route path="/products/:id" element={<ProductDetails />} />
           <Route
@@ -35,9 +48,24 @@ const App: React.FC = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="/cart" element={<Cart />} />
 
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <Cart />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/login"
+            element={
+              <Unprotected>
+                <Login />
+              </Unprotected>
+            }
+          />
 
           <Route
             path="*"

@@ -1,7 +1,8 @@
-import React, { FormEvent } from "react";
+import { FormEvent } from "react";
 import { toast } from "react-toastify";
+import { motion } from "framer-motion";
 
-const NewsLetterBox: React.FC = () => {
+const NewsLetterBox = () => {
   const onSubmitHandler = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     event.currentTarget.reset();
@@ -9,37 +10,56 @@ const NewsLetterBox: React.FC = () => {
   };
 
   return (
-    <div className="text-center my-10">
-      <p className="font-bold  text-gray-700 text-3xl">
-        Subscribe Now for Instant{" "}
+    <motion.div
+      className="text-center py-12"
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1, ease: "easeInOut" }}
+      viewport={{ once: true }}
+    >
+      <motion.h1
+        className="text-3xl sm:text-4xl font-semibold mb-6 text-gray-800"
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.8 }}
+      >
+        Subscribe Now for{" "}
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
           Notifications!
         </span>
-      </p>
-      <p className="text-gray-800 ml-10 text-md mt-3">
-        Stay ahead of the game with our subscription service—get fast
-        notifications on new arrivals, exclusive deals, and special events
-        delivered straight to your inbox. Don't miss out on the latest trends
-        and offers! Sign up today and be the first to know!
-      </p>
+      </motion.h1>
+      <motion.p
+        className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.8 }}
+      >
+        Stay one step ahead with our exclusive travel alerts!
+      </motion.p>
       <form
         onSubmit={onSubmitHandler}
-        className="w-full sm:w-1/2 flex items-center gap-3 my-6 mx-auto border border-gray-300  pl-3"
+        className="w-full sm:w-1/2 mx-auto flex items-center gap-4"
       >
-        <input
+        <motion.input
           type="email"
           placeholder="Enter your email"
-          className="w-full sm:flex-1 outline-none bg-transparent "
+          className="bg-inherit w-full py-3 px-4 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
           required
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
         />
-        <button
+        <motion.button
           type="submit"
-          className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs px-10 py-4 font-medium transition-colors duration-200"
+          className="bg-gradient-to-b from-sky-500 to-blue-500 text-white py-3 px-6 rounded-lg hover:from-sky-600 hover:to-blue-600 transition ease-in-out duration-200"
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1, duration: 0.5 }}
         >
           Subscribe
-        </button>
+        </motion.button>
       </form>
-    </div>
+    </motion.div>
   );
 };
 

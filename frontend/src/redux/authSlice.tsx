@@ -58,12 +58,10 @@ export const logout = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-      // Remove token from localStorage to log the user out
       localStorage.removeItem("token");
 
       return null;
     } catch (error: unknown) {
-      // Cast error to Error to access 'message' property
       const err = error as Error;
       return rejectWithValue(err.message || "Logout failed");
     }

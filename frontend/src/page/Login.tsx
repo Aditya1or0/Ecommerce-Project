@@ -27,6 +27,7 @@ export default function Login() {
       setEmailError("Email is required");
       return false;
     } else if (!emailRegex.test(email)) {
+      //.test() method check that the string inside the () is matching or not if it is not matching so it will give error
       setEmailError("Please enter a valid email address");
       return false;
     }
@@ -46,14 +47,12 @@ export default function Login() {
     return true;
   };
 
-  // Validate form on input changes
   useEffect(() => {
     const isEmailValid = validateEmail(email);
     const isPasswordValid = validatePassword(password);
 
     let isFormValid = isEmailValid && isPasswordValid;
 
-    // If registration form, check first and last name
     if (!isLogin) {
       isFormValid =
         isFormValid && firstName.trim() !== "" && lastName.trim() !== "";
@@ -62,12 +61,10 @@ export default function Login() {
     setFormValid(isFormValid);
   }, [email, password, firstName, lastName, isLogin]);
 
-  // Server-side validation function
   const serverSideValidate = () => {
     const isEmailValid = validateEmail(email);
     const isPasswordValid = validatePassword(password);
 
-    // For registration, validate first and last names
     if (!isLogin && (firstName.trim() === "" || lastName.trim() === "")) {
       toast.error("First and last name are required");
       return false;
@@ -79,7 +76,6 @@ export default function Login() {
   const onSubmitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Server-side validation as a defense against HTML tampering
     if (!serverSideValidate()) {
       toast.error("Please check your inputs and try again");
       return;
@@ -88,6 +84,8 @@ export default function Login() {
     try {
       if (isLogin) {
         const result = await dispatch(login({ email, password })).unwrap();
+        // unwrap() method is used to get the value from the promise if prosmise is resolved and if the promise if rejected then it will give us error and help us to not manually check fulfiiled or rejected cases.
+
         if (result) {
           toast.success("Login successful!");
           navigate("/", { replace: true });

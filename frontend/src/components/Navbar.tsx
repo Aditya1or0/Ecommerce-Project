@@ -18,7 +18,6 @@ const Navbar: React.FC = () => {
 
   const { token } = useSelector((state: RootState) => state.auth);
 
-  // Handle clicks outside the user menu to close it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

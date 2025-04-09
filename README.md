@@ -104,4 +104,3 @@ ShopiFy is a modern, full-stack eCommerce web application built with a focus on 
 ---
 
 Thank you for checking out ShopiFy! 🎉
-```

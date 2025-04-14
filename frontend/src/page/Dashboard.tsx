@@ -1,397 +1,484 @@
-import React, { useEffect } from "react";
+"use client";
+
+import type React from "react";
+
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   User,
   ShieldCheck,
   Calendar,
   Mail,
-  Phone,
-  Bell,
-  Shield,
+  Edit,
+  Activity,
+  FileText,
+  Camera,
 } from "lucide-react";
-import { motion, useAnimation } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
+import { toast } from "react-toastify";
+import UserEditModal from "../components/UserEditModal";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 interface UserInfo {
-  name: string;
-  email: string;
-  phone: string;
-  dob: string;
+  id: number;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  age?: number;
+  dateOfBirth?: string;
+  bio?: string;
+  avatar?: string;
 }
 
-const UserInfoCard: React.FC<{ user: UserInfo }> = ({ user }) => {
-  const controls = useAnimation();
+interface JwtPayload {
+  email: string;
+  sub: number;
+  iat: number;
+  exp: number;
+}
+
+export default function Dashboard() {
+  const [user, setUser] = useState<UserInfo | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("profile");
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+
+  // Use callback to allow refreshing data after updates
+  const fetchUserData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        toast.error("Authentication token missing");
+        return;
+      }
+
+      // Decode the JWT token to get the user ID
+      const decoded = jwtDecode<JwtPayload>(token);
+      const userId = decoded.sub; // Get user ID from sub claim
+
+      const response = await axios.get(`http://localhost:3000/user/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUser({
+        id: response.data.id,
+        firstName: response.data.firstName || "",
+        lastName: response.data.lastName || "",
+        email: response.data.email || "",
+        age: response.data.age || 0,
+        dateOfBirth: response.data.dateOfBirth || "",
+        bio: response.data.bio || "",
+        avatar: response.data.avatar || "",
+      });
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      toast.error("Failed to load user data");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    controls.start({
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: "easeOut" },
-    });
-  }, [controls]);
+    fetchUserData();
+  }, [fetchUserData]);
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        staggerChildren: 0.2,
-      },
-    },
+  const handleAvatarClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  };
+  const handleAvatarChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  const iconBoxMotion = {
-    rest: { scale: 1 },
-    hover: {
-      scale: 1.1,
-      transition: {
-        duration: 0.3,
-        type: "spring",
-        stiffness: 400,
-        damping: 10,
-      },
-    },
-  };
+    // Validate file is an image
+    if (!file.type.match(/image\/(jpeg|jpg|png|gif)/i)) {
+      toast.error("Please select a valid image file (JPG, PNG, or GIF)");
+      return;
+    }
 
-  return (
-    <motion.div
-      className="bg-white rounded-xl shadow-lg overflow-hidden w-full max-w-md transform hover:shadow-xl border border-gray-100"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.3 }}
-    >
-      {/* Card Header with Gradient */}
-      <motion.div
-        className="bg-gradient-to-r from-cyan-500 to-blue-600 p-6 relative"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-      >
-        <motion.div
-          className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 bg-white p-3 rounded-full shadow-md border-4 border-white"
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-        >
-          <motion.div
-            className="bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full p-3"
-            whileHover={{ rotate: 10, scale: 1.05 }}
-          >
-            <User size={36} className="text-white" />
-          </motion.div>
-        </motion.div>
-      </motion.div>
+    // Validate file size
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File is too large. Maximum size is 5MB");
+      return;
+    }
 
-      {/* Card Content */}
-      <motion.div
-        className="pt-16 pb-8 px-8"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.7, duration: 0.8 }}
-      >
-        <motion.h2
-          className="text-2xl font-bold text-center text-gray-800 mb-1"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-        >
-          {user.name}
-        </motion.h2>
-        <motion.p
-          className="text-center text-gray-500 mb-6 flex items-center justify-center gap-1"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9, duration: 0.5 }}
-        >
-          <ShieldCheck size={16} className="text-green-500" />
-          <span>Verified User</span>
-        </motion.p>
+    try {
+      setUploadingAvatar(true);
+      const token = localStorage.getItem("token");
 
-        <motion.div
-          className="space-y-4"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.div
-            className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg transition-all hover:bg-gray-100"
-            variants={itemVariants}
-            whileHover="hover"
-            initial="rest"
-          >
-            <motion.div
-              className="bg-blue-100 p-2 rounded-lg"
-              variants={iconBoxMotion}
-            >
-              <Mail size={20} className="text-blue-600" />
-            </motion.div>
-            <div>
-              <p className="text-sm text-gray-500">Email Address</p>
-              <p className="font-medium text-gray-800">{user.email}</p>
-            </div>
-          </motion.div>
+      if (!token) {
+        toast.error("Authentication token missing");
+        return;
+      }
 
-          <motion.div
-            className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg transition-all hover:bg-gray-100"
-            variants={itemVariants}
-            whileHover="hover"
-            initial="rest"
-          >
-            <motion.div
-              className="bg-green-100 p-2 rounded-lg"
-              variants={iconBoxMotion}
-            >
-              <Phone size={20} className="text-green-600" />
-            </motion.div>
-            <div>
-              <p className="text-sm text-gray-500">Phone Number</p>
-              <p className="font-medium text-gray-800">{user.phone}</p>
-            </div>
-          </motion.div>
+      const formData = new FormData();
+      formData.append("file", file);
 
-          <motion.div
-            className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg transition-all hover:bg-gray-100"
-            variants={itemVariants}
-            whileHover="hover"
-            initial="rest"
-          >
-            <motion.div
-              className="bg-purple-100 p-2 rounded-lg"
-              variants={iconBoxMotion}
-            >
-              <Calendar size={20} className="text-purple-600" />
-            </motion.div>
-            <div>
-              <p className="text-sm text-gray-500">Date of Birth</p>
-              <p className="font-medium text-gray-800">{user.dob}</p>
-            </div>
-          </motion.div>
-        </motion.div>
-      </motion.div>
+      const response = await axios.post(
+        "http://localhost:3000/user/upload-avatar",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      {/* Card Footer */}
-      <motion.div
-        className="border-t border-gray-100 p-4 bg-gray-50"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 0.5 }}
-      >
-        <motion.button
-          className="w-full py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium rounded-lg transition-all hover:opacity-90"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-        >
-          Edit Profile
-        </motion.button>
-      </motion.div>
-    </motion.div>
-  );
-};
-
-const Dashboard: React.FC = () => {
-  const user: UserInfo = {
-    name: "Aditya Sharma",
-    email: "a@xyz.com",
-    phone: "+91 9876543210",
-    dob: "01-Apr-1995",
-  };
-
-  // Animation for progress bars
-  const ProgressBar: React.FC<{
-    value: number;
-    color: string;
-    delay: number;
-  }> = ({ value, color, delay }) => {
-    const controls = useAnimation();
-
-    useEffect(() => {
-      controls.start({
-        width: `${value}%`,
-        transition: { duration: 1.5, delay, ease: "easeOut" },
+      // Update the user state with the new avatar URL
+      setUser((prevUser) => {
+        if (prevUser) {
+          return { ...prevUser, avatar: response.data.avatarUrl };
+        }
+        return prevUser;
       });
-    }, [controls, value, delay]);
+      fetchUserData(); //
 
+      toast.success("Profile picture updated successfully");
+      console.log("Avatar upload response:", response.data);
+      console.log("Avatar URL:", response.data.avatarUrl);
+      console.log(
+        "Full image URL:",
+        `http://localhost:3000${response.data.avatarUrl}`
+      );
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      toast.error("Failed to upload profile picture");
+    } finally {
+      setUploadingAvatar(false);
+      // Clear the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  if (loading) {
     return (
-      <div className="w-full bg-gray-200 rounded-full h-2.5">
-        <motion.div
-          className={`${color} h-2.5 rounded-full`}
-          initial={{ width: "0%" }}
-          animate={controls}
-        />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
+          <p className="mt-4 text-gray-600 font-medium">
+            Loading your profile...
+          </p>
+        </div>
       </div>
     );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
+          <p className="text-red-500 text-center text-lg font-medium">
+            You are not logged in
+          </p>
+          <button
+            className="mt-4 w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:opacity-80 transition-colors"
+            onClick={() => navigate("/login")}
+          >
+            Return to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const getInitials = () => {
+    if (user.firstName && user.lastName) {
+      return `${user.firstName.charAt(0)}${user.lastName.charAt(
+        0
+      )}`.toUpperCase();
+    } else if (user.firstName) {
+      return user.firstName.charAt(0).toUpperCase();
+    } else if (user.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+    return "U";
   };
 
   return (
-    <motion.div
-      className="min-h-screen flex flex-col items-center p-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-    >
-      {/* Header with Animation */}
-      <motion.div
-        className="w-full max-w-4xl mb-10 text-center"
-        initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <motion.h1
-          className="text-4xl sm:text-5xl font-bold text-gray-800 mb-2"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-        >
-          My{" "}
-          <motion.span
-            className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-          >
-            Dashboard
-          </motion.span>
-        </motion.h1>
-        <motion.p
-          className="text-gray-500"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7, duration: 0.8 }}
-        >
-          Welcome back, Aditya! Your personal dashboard awaits.
-        </motion.p>
-      </motion.div>
+    <div className="min-h-screen">
+      {/* Hidden file input for avatar upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept="image/jpeg,image/png,image/gif,image/jpg"
+        onChange={handleAvatarChange}
+      />
 
-      <motion.div
-        className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-6"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.8 }}
-      >
-        {/* Main User Card */}
-        <UserInfoCard user={user} />
-
-        {/* Stats Cards */}
-        <motion.div
-          className="grid grid-cols-1 gap-4 h-fit"
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-        >
-          <motion.div
-            className="bg-white rounded-xl shadow-md p-6 border border-gray-100"
-            whileHover={{ y: -5 }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.h3
-              className="text-lg font-semibold text-gray-700 mb-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7, duration: 0.5 }}
-            >
-              Activity Summary
-            </motion.h3>
-            <div className="space-y-3">
-              <motion.div
-                className="flex justify-between items-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8, duration: 0.5 }}
-              >
-                <span className="text-gray-600">Login Streak</span>
-                <span className="font-medium text-green-600">8 days</span>
-              </motion.div>
-              <ProgressBar value={80} color="bg-green-600" delay={1} />
-
-              <motion.div
-                className="flex justify-between items-center mt-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.9, duration: 0.5 }}
-              >
-                <span className="text-gray-600">Profile Completion</span>
-                <span className="font-medium text-blue-600">85%</span>
-              </motion.div>
-              <ProgressBar value={85} color="bg-blue-600" delay={1.2} />
+      {/* Top Navigation Bar */}
+      <nav className="bg-white/30 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <h1 className="text-2xl bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600 font-bold">
+                MyDashboard
+              </h1>
             </div>
-          </motion.div>
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <button
+                  className="flex items-center space-x-2 focus:outline-none"
+                  onClick={() => setShowModal(true)}
+                >
+                  {user.avatar ? (
+                    <img
+                      src={
+                        user.avatar?.startsWith("http")
+                          ? user.avatar
+                          : `http://localhost:3000${user.avatar}`
+                      }
+                      alt="Profile"
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-white font-medium">
+                      {getInitials()}
+                    </div>
+                  )}
+                  <span className="text-gray-700 hidden sm:block">{`${
+                    user.firstName || ""
+                  } ${user.lastName || ""}`}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
 
-          <motion.div
-            className="bg-white rounded-xl shadow-md p-6 border border-gray-100"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1, duration: 0.8 }}
-            whileHover={{ y: -5 }}
-          >
-            <motion.h3
-              className="text-lg font-semibold text-gray-700 mb-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.1, duration: 0.5 }}
-            >
-              Recent Notifications
-            </motion.h3>
-            <motion.div
-              className="space-y-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.2, duration: 0.6 }}
-            >
-              <motion.div
-                className="flex items-start gap-3"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.3, duration: 0.5 }}
-              >
-                <motion.div
-                  className="bg-blue-100 p-2 rounded-full mt-1"
-                  whileHover={{ scale: 1.2 }}
-                >
-                  <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                </motion.div>
-                <div>
-                  <p className="text-gray-800 font-medium">Security Update</p>
-                  <p className="text-gray-500 text-sm">
-                    Your password was changed 5 days ago
-                  </p>
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Sidebar */}
+            <div className="w-full lg:w-64 bg-white/70 rounded-lg shadow-md p-6 h-fit">
+              <div className="flex flex-col items-center mb-6">
+                {/* Avatar with upload indicator */}
+                <div className="relative group mb-4">
+                  {uploadingAvatar ? (
+                    <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
+                    </div>
+                  ) : (
+                    <>
+                      {user.avatar ? (
+                        <img
+                          src={
+                            user.avatar?.startsWith("http")
+                              ? user.avatar
+                              : `http://localhost:3000${user.avatar}`
+                          }
+                          alt="Profile"
+                          className="h-24 w-24 rounded-full object-cover"
+                          onClick={handleAvatarClick}
+                        />
+                      ) : (
+                        <div
+                          className="h-24 w-24 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-white text-3xl font-bold"
+                          onClick={handleAvatarClick}
+                        >
+                          {getInitials()}
+                        </div>
+                      )}
+                      <div
+                        className="absolute bottom-0 right-0 bg-blue-600 p-2 rounded-full cursor-pointer shadow-lg hover:bg-blue-700 transition-colors"
+                        onClick={handleAvatarClick}
+                      >
+                        <Camera className="h-4 w-4 text-white" />
+                      </div>
+                    </>
+                  )}
                 </div>
-              </motion.div>
-              <motion.div
-                className="flex items-start gap-3"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.4, duration: 0.5 }}
-              >
-                <motion.div
-                  className="bg-green-100 p-2 rounded-full mt-1"
-                  whileHover={{ scale: 1.2 }}
+                <h2 className="text-xl font-semibold text-gray-800">{`${
+                  user.firstName || ""
+                } ${user.lastName || ""}`}</h2>
+                <p className="text-sm text-gray-500">{user.email}</p>
+              </div>
+
+              <div className="space-y-2">
+                <button
+                  onClick={() => setActiveTab("profile")}
+                  className={`w-full flex items-center space-x-2 p-2 rounded-md transition-colors ${
+                    activeTab === "profile"
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
                 >
-                  <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                </motion.div>
-                <div>
-                  <p className="text-gray-800 font-medium">Account Verified</p>
-                  <p className="text-gray-500 text-sm">
-                    Your account was successfully verified
-                  </p>
-                </div>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      </motion.div>
-    </motion.div>
+                  <User className="w-5 h-5" />
+                  <span>Profile</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("activity")}
+                  className={`w-full flex items-center space-x-2 p-2 rounded-md transition-colors ${
+                    activeTab === "activity"
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Activity className="w-5 h-5" />
+                  <span>Activity</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="flex-1">
+              <AnimatePresence mode="wait">
+                {activeTab === "profile" && (
+                  <motion.div
+                    key="profile"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white/70 rounded-lg shadow-md overflow-hidden"
+                  >
+                    <div className="p-6 bg-gradient-to-r from-cyan-500 to-blue-600 flex justify-between items-center">
+                      <h2 className="text-xl font-bold text-white">
+                        Personal Information
+                      </h2>
+                      <button
+                        onClick={() => setShowModal(true)}
+                        className="bg-white text-cyan-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors flex items-center space-x-2"
+                      >
+                        <Edit className="w-4 h-4" />
+                        <span>Edit Profile</span>
+                      </button>
+                    </div>
+
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-6">
+                          <div className="flex items-center space-x-4 group p-4 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 group-hover:bg-blue-200 transition-colors">
+                              <User className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Full Name</p>
+                              <p className="text-lg font-medium text-gray-800">
+                                {`${user.firstName || ""} ${
+                                  user.lastName || "Not specified"
+                                }`}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-4 group p-4 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 group-hover:bg-blue-200 transition-colors">
+                              <Mail className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">
+                                Email Address
+                              </p>
+                              <p className="text-lg font-medium text-gray-800">
+                                {user.email}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-4 group p-4 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 group-hover:bg-blue-200 transition-colors">
+                              <Calendar className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">
+                                Date of Birth
+                              </p>
+                              <p className="text-lg font-medium text-gray-800">
+                                {user.dateOfBirth?.slice(0, 10) ||
+                                  "Not specified"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-6">
+                          <div className="flex items-center space-x-4 group p-4 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 group-hover:bg-blue-200 transition-colors">
+                              <ShieldCheck className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Age</p>
+                              <p className="text-lg font-medium text-gray-800">
+                                {user.age
+                                  ? `${user.age} years`
+                                  : "Not specified"}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start space-x-4 group p-4 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 group-hover:bg-blue-200 transition-colors">
+                              <FileText className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Bio</p>
+                              <p className="text-lg font-medium text-gray-800">
+                                {user.bio || "No bio provided"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "activity" && (
+                  <motion.div
+                    key="activity"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white rounded-lg shadow-md p-6"
+                  >
+                    <h2 className="text-xl font-bold text-gray-800 mb-6">
+                      Your Liked Products
+                    </h2>
+                    <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+                      <Activity className="w-16 h-16 mb-4 text-gray-300" />
+                      <p className="text-lg">No recent activity to display</p>
+                      <p className="text-sm mt-2">
+                        Your activity will appear here
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {showModal && (
+        <UserEditModal
+          user={{
+            id: user.id,
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            dateOfBirth: user.dateOfBirth || "",
+            age: user.age || 0,
+            bio: user.bio || "",
+          }}
+          onClose={() => setShowModal(false)}
+          onUpdate={fetchUserData}
+        />
+      )}
+    </div>
   );
-};
-
-export default Dashboard;
+}

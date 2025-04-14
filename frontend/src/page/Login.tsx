@@ -17,6 +17,9 @@ export default function Login() {
   const [passwordError, setPasswordError] = useState("");
   const [formValid, setFormValid] = useState(false);
 
+  const [emailTouched, setEmailTouched] = useState(false); // Track if email is touched
+  const [passwordTouched, setPasswordTouched] = useState(false); // Track if password is touched
+
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state: RootState) => state.auth);
@@ -27,7 +30,6 @@ export default function Login() {
       setEmailError("Email is required");
       return false;
     } else if (!emailRegex.test(email)) {
-      //.test() method check that the string inside the () is matching or not if it is not matching so it will give error
       setEmailError("Please enter a valid email address");
       return false;
     }
@@ -84,7 +86,6 @@ export default function Login() {
     try {
       if (isLogin) {
         const result = await dispatch(login({ email, password })).unwrap();
-        // unwrap() method is used to get the value from the promise if prosmise is resolved and if the promise if rejected then it will give us error and help us to not manually check fulfiiled or rejected cases.
 
         if (result) {
           toast.success("Login successful!");
@@ -168,13 +169,14 @@ export default function Login() {
                 setEmail(e.target.value);
                 validateEmail(e.target.value);
               }}
+              onBlur={() => setEmailTouched(true)} // Mark as touched when the user leaves the field
               className={`w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                emailError ? "border-red-500" : ""
+                emailTouched && emailError ? "border-red-500" : ""
               }`}
               placeholder="you@example.com"
               required
             />
-            {emailError && (
+            {emailTouched && emailError && (
               <p className="mt-1 text-sm text-red-600">{emailError}</p>
             )}
           </div>
@@ -193,14 +195,15 @@ export default function Login() {
                 setPassword(e.target.value);
                 validatePassword(e.target.value);
               }}
+              onBlur={() => setPasswordTouched(true)} // Mark as touched when the user leaves the field
               className={`w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                passwordError ? "border-red-500" : ""
+                passwordTouched && passwordError ? "border-red-500" : ""
               }`}
               placeholder="••••••••"
               minLength={6}
               required
             />
-            {passwordError && (
+            {passwordTouched && passwordError && (
               <p className="mt-1 text-sm text-red-600">{passwordError}</p>
             )}
           </div>

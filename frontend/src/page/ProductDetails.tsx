@@ -1,16 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { api } from "../axios/util";
-import { addToCart } from "../redux/cartSlice";
+import { addToCartAsync } from "../redux/cartSlice";
+import { RootState, AppDispatch } from "../redux/store/store";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 import NewsLetterBox from "../components/NewsLetterBox";
 import { toast } from "react-toastify";
+
+interface Product {
+  id: number;
+  title: string;
+  price: number;
+  image: string;
+  description: string;
+}
 
 const ProductDetails: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [product, setProduct] = useState<any>(null);
-  const dispatch = useDispatch();
+  const [product, setProduct] = useState<Product | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const token = useSelector((state: RootState) => state.auth.token);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -19,6 +30,7 @@ const ProductDetails: React.FC = () => {
         setProduct(response.data);
       } catch (error) {
         console.error("Error fetching product details", error);
+        toast.error("Failed to fetch product details");
       }
     };
 
@@ -27,19 +39,32 @@ const ProductDetails: React.FC = () => {
     }
   }, [id]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
+    if (!token) {
+      toast.error("Please login to add items to cart");
+      navigate("/login");
+      return;
+    }
+
     if (product) {
-      dispatch(
-        addToCart({
-          id: product.id,
-          title: product.title,
-          price: product.price,
-          image: product.image,
-          quantity: 0,
-        })
-      );
-      toast.success("Product added to cart!");
-      navigate("/cart");
+      try {
+        const decoded = jwtDecode<JwtPayload>(token);
+        const userId = Number(decoded.sub);
+
+        await dispatch(
+          addToCartAsync({
+            userId,
+            productId: product.id,
+            quantity: 1,
+          })
+        ).unwrap();
+
+        toast.success("Product added to cart!");
+        navigate("/cart");
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+        toast.error("Failed to add product to cart");
+      }
     }
   };
 
@@ -72,7 +97,7 @@ const ProductDetails: React.FC = () => {
           </p>
           <button
             onClick={handleAddToCart}
-            className="px-4 py-2 bg-cyan-500 text-white rounded w-1/3 sm:w-1/4  md:w-1/3 ml-10 mt-4 hover:bg-cyan-600 transition-colors"
+            className="px-4 py-2 bg-cyan-500 text-white rounded w-1/3 sm:w-1/4 md:w-1/3 ml-10 mt-4 hover:bg-cyan-600 transition-colors"
           >
             Add to Cart
           </button>

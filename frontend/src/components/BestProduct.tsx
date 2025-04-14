@@ -1,30 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { values } from "../assets/assets"; // Assuming values contains a currency symbol like "$"
+import { values } from "../assets/assets";
 import { api } from "../axios/util";
 import { useDispatch } from "react-redux";
-import { setProducts } from "../redux/productSlice"; // Import the action to update Redux store
-
-interface Rating {
-  rate: number;
-  count: number;
-}
+import { setProducts } from "../redux/productSlice";
 
 interface Product {
-  ratingCount: number;
   id: number;
   title: string;
   price: number;
   description: string;
   category: string;
   image: string;
-  rating: Rating;
+  ratingCount: number;
+  ratingRate: number;
 }
 
 const BestProduct: React.FC = () => {
   const dispatch = useDispatch();
   const [products, setProductsState] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+
+  const displayedProducts = filteredProducts.slice(0, 4);
 
   // Fetch products from the backend
   useEffect(() => {
@@ -43,20 +40,23 @@ const BestProduct: React.FC = () => {
 
   // Filter products based on rating above 4 after products are fetched
   useEffect(() => {
-    setFilteredProducts(products.filter((product) => product.rating.rate > 4));
+    setFilteredProducts(products.filter((product) => product.ratingRate > 4));
   }, [products]); // Re-run the filter logic when 'products' state changes
 
   return (
     <>
       <h1 className="text-center mt-10 mb-4 font-bold text-gray-700 text-3xl">
-        Best <span className="text-cyan-600 ">Products</span>
+        Best{" "}
+        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+          Products
+        </span>
       </h1>
       <p className="text-center text-gray-600 text-md">
         Our Best Products that have rating above 4
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6 py-8">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
+        {displayedProducts.length > 0 ? (
+          displayedProducts.map((product) => (
             <Link to={`/products/${product.id}`} key={product.id}>
               <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white-100/70">
                 <img
@@ -76,9 +76,7 @@ const BestProduct: React.FC = () => {
                   </p>
                   <p>
                     <span className="font-semibold mr-1">Rating:</span>
-                    <span className="font-bold mr-2">
-                      {product.rating.rate}
-                    </span>
+                    <span className="font-bold mr-2">{product.ratingRate}</span>
                     Total Reviews: {product.ratingCount}
                   </p>
                 </div>

@@ -8,19 +8,23 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  email     String   @unique
-
-  firstName String?
-  lastName  String?
-
-  password String
+  id          Int        @id @default(autoincrement())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  email       String     @unique
+  firstName   String?
+  lastName    String?
+  dateOfBirth DateTime?  @db.Date
+  age         Int?
+  bio         String?
+  avatar      String?
+  password    String
+  Cart        Cart[]
+  Favorite    Favorite[]
 }
 
 model Product {
-  id          Int    @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   title       String
   price       Float
   description String
@@ -29,11 +33,28 @@ model Product {
   ratingRate  Float
   ratingCount Int
   Cart        Cart[]
+  Favorite    Favorite[]
 }
 
 model Cart {
   id        Int     @id @default(autoincrement())
   productId Int
+  userId    Int
   quantity  Int
   Product   Product @relation(fields: [productId], references: [id])
+  User      User    @relation(fields: [userId], references: [id])
+
+  @@unique([userId, productId])
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
 }

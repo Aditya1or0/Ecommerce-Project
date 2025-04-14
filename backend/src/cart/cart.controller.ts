@@ -1,49 +1,46 @@
-// import { Controller, Post, Body, Get, Patch, Delete } from '@nestjs/common';
-// import { CartService } from './cart.service';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Delete,
+  Param,
+  Put,
+} from '@nestjs/common';
+import { CartService } from './cart.service';
 
-// @Controller('cart')
-// export class CartController {
-//   constructor(private cartService: CartService) {}
+@Controller('cart')
+export class CartController {
+  constructor(private cartService: CartService) {}
 
-//   @Post('add')
-//   async addToCart(
-//     @Body() body: { userId: number; productId: number; quantity: number },
-//   ) {
-//     // Add product to cart or update quantity if product exists
-//     return this.cartService.addToCart(
-//       body.userId,
-//       body.productId,
-//       body.quantity,
-//     );
-//   }
+  @Get(':userId')
+  getCart(@Param('userId') userId: string) {
+    return this.cartService.getUserCart(Number(userId));
+  }
 
-//   @Get()
-//   async getCartItems(@Body() body: { userId: number }) {
-//     // Fetch the cart items for a specific user
-//     return this.cartService.getCartItems(body.userId);
-//   }
+  @Post('add')
+  addToCart(
+    @Body() body: { userId: number; productId: number; quantity: number },
+  ) {
+    const { userId, productId, quantity } = body;
+    return this.cartService.addToCart(userId, productId, quantity);
+  }
 
-//   @Patch(':cartItemId/increase')
-//   async increaseQuantity(@Body() body: { userId: number; cartItemId: number }) {
-//     // Increase quantity of an item in the cart
-//     return this.cartService.updateQuantity(body.cartItemId, 1);
-//   }
+  @Put('update/:cartId')
+  updateQuantity(
+    @Param('cartId') cartId: string,
+    @Body('quantity') quantity: number,
+  ) {
+    return this.cartService.updateQuantity(Number(cartId), quantity);
+  }
 
-//   @Patch(':cartItemId/decrease')
-//   async decreaseQuantity(@Body() body: { userId: number; cartItemId: number }) {
-//     // Decrease quantity of an item in the cart
-//     return this.cartService.updateQuantity(body.cartItemId, -1);
-//   }
+  @Delete('remove/:cartId')
+  removeItem(@Param('cartId') cartId: string) {
+    return this.cartService.removeFromCart(Number(cartId));
+  }
 
-//   @Delete(':cartItemId')
-//   async removeFromCart(@Body() body: { cartItemId: number }) {
-//     // Remove item from the cart
-//     return this.cartService.removeFromCart(body.cartItemId);
-//   }
-
-//   // @Delete('clear')
-//   // async clearCart(@Body() body: { userId: number }) {
-//   //   // Clear all cart items for a user
-//   //   return this.cartService.clearCart(body.userId);
-//   // }
-// }
+  @Delete('clear/:userId')
+  clearCart(@Param('userId') userId: string) {
+    return this.cartService.clearCart(Number(userId));
+  }
+}

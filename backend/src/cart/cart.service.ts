@@ -1,73 +1,61 @@
-// import { Injectable } from '@nestjs/common';
-// import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
-// @Injectable()
-// export class CartService {
-//   constructor(private prisma: PrismaService) {}
+@Injectable()
+export class CartService {
+  constructor(private prisma: PrismaService) {}
 
-//   // Add product to cart or update quantity if product exists
-//   async addToCart(userId: number, productId: number, quantity: number) {
-//     const existingItem = await this.prisma.cart.findFirst({
-//       where: { userId, productId },
-//     });
+  //fetch all item present in cart
+  async getUserCart(userId: number) {
+    return this.prisma.cart.findMany({
+      where: { userId },
+      include: {
+        Product: true,
+      },
+    });
+  }
 
-//     if (existingItem) {
-//       // If item exists, update quantity
-//       return this.prisma.cart.update({
-//         where: { id: existingItem.id },
-//         data: {
-//           quantity: existingItem.quantity + quantity,
-//         },
-//       });
-//     }
+  //add a item in cart
+  async addToCart(userId: number, productId: number, quantity: number) {
+    const existing = await this.prisma.cart.findFirst({
+      where: { userId, productId },
+    });
+    //if product is present already then it will add whatever quantity is user selects
+    if (existing) {
+      return this.prisma.cart.update({
+        where: { id: existing.id },
+        data: { quantity: existing.quantity + quantity },
+      });
+    }
+    //if product is not present then it will add the product to cart
+    return this.prisma.cart.create({
+      data: {
+        userId,
+        productId,
+        quantity,
+      },
+    });
+  }
 
-//     // If item does not exist, create a new cart item
-//     return this.prisma.cart.create({
-//       data: {
-//         userId,
-//         productId,
-//         quantity,
-//       },
-//     });
-//   }
+  //shows the total items from cart which i can be used in navbar as well as in cartpage
+  async updateQuantity(cartId: number, quantity: number) {
+    return this.prisma.cart.update({
+      where: { id: cartId },
+      data: { quantity },
+    });
+  }
 
-//   // Fetch all cart items for a user
-//   async getCartItems(userId: number) {
-//     return this.prisma.cart.findMany({
-//       where: { userId },
-//       include: {
-//         product: true, // Include product details
-//       },
-//     });
-//   }
+  //remove a particular item from cart
+  async removeFromCart(cartId: number) {
+    return this.prisma.cart.delete({
+      where: { id: cartId },
+    });
+  }
 
-//   // Update the quantity of a cart item (increase or decrease)
-//   async updateQuantity(cartItemId: number, delta: number) {
-//     const cartItem = await this.prisma.cart.findUnique({
-//       where: { id: cartItemId },
-//     });
-
-//     if (cartItem) {
-//       return this.prisma.cart.update({
-//         where: { id: cartItemId },
-//         data: {
-//           quantity: cartItem.quantity + delta,
-//         },
-//       });
-//     }
-//   }
-
-//   // Remove an item from the cart
-//   async removeFromCart(cartItemId: number) {
-//     return this.prisma.cart.delete({
-//       where: { id: cartItemId },
-//     });
-//   }
-
-//   // Clear all items from the cart for a user
-//   // async clearCart(userId: number) {
-//   //   return this.prisma.cart.deleteMany({
-//   //     where: { userId },
-//   //   });
-//   // }
-// }
+  //clear all item from cart
+  async clearCart(userId: number) {
+    return this.prisma.cart.deleteMany({
+      where: { userId },
+    });
+  }
+}

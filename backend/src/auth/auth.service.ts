@@ -13,8 +13,16 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const { password, ...result } = user;
+
+    if (!user) {
+      return null;
+    }
+
+    const passwordString = String(password);
+    const hashedPassword = String(user.password);
+    const isMatch = await bcrypt.compare(passwordString, hashedPassword);
+    if (isMatch) {
+      const { password: _, ...result } = user;
       return result;
     }
     return null;
@@ -50,10 +58,7 @@ export class AuthService {
       });
 
       if (existingUser) {
-        throw new HttpException(
-          'Email is already taken',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new HttpException('Email is already taken', HttpStatus.CONFLICT);
       }
 
       const salt = await bcrypt.genSalt();

@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setProducts } from "../redux/productSlice"; // Import the action
-import ProductCard from "./ProductCard";
+import { setProducts } from "../redux/productSlice";
+import ProductCard from "./products/ProductCard";
 import { RootState } from "../redux/store/store";
 import { api } from "../axios/util";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
-const ProductList: React.FC = () => {
+const ProductsOnHome: React.FC = () => {
   const dispatch = useDispatch();
-
   const products = useSelector((state: RootState) => state.products.products);
 
   const fetchData = async () => {
@@ -81,17 +81,23 @@ const ProductList: React.FC = () => {
       >
         {products.slice(0, 8).map((product, index) => (
           <motion.div
-            key={index}
+            key={product.id || index}
             variants={itemVariants}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            // Remove the whileHover and whileTap animations from here
+            className="card-container"
           >
             <ProductCard product={product} />
           </motion.div>
         ))}
       </motion.div>
+      <Link
+        to="/products"
+        className="flex justify-center items-center border-b-2 border-transparent hover:border-cyan-600 text-cyan-600 font-bold text-lg mb-10 transition-all duration-300"
+      >
+        Show All Products
+      </Link>
     </div>
   );
 };
 
-export default ProductList;
+export default ProductsOnHome;

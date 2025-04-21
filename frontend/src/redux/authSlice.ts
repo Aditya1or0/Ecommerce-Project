@@ -19,7 +19,7 @@ export const login = createAsyncThunk(
   "auth/login",
   async (
     credentials: { email: string; password: string },
-    { rejectWithValue }
+    { rejectWithValue } //this rejectwithvalue used to return a rejected promise if the promise is rejected
   ) => {
     try {
       const response = await api.post("/login", credentials);

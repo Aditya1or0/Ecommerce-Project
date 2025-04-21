@@ -1,15 +1,16 @@
 import React from "react";
-import Hero from "../components/Hero";
-import Products from "../components/ProductList";
+import Hero from "../components/homepage/Hero";
+
 import NewsLetterBox from "../components/NewsLetterBox";
-import Experience from "../components/Experience";
-import BestProduct from "../components/BestProduct";
+import Experience from "../components/about/Experience";
+import BestProduct from "../components/homepage/BestProduct";
+import ProductsOnHome from "../components/ProductsOnHome";
 
 const Home: React.FC = () => {
   return (
     <div>
       <Hero />
-      <Products />
+      <ProductsOnHome />
       <BestProduct />
       <Experience />
       <NewsLetterBox />

@@ -3,12 +3,12 @@
 import type React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { LogOut, User, ShoppingBag, ShoppingCart } from "lucide-react";
+import { LogOut, User, ShoppingCart } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState, AppDispatch } from "../redux/store/store";
+import type { RootState, AppDispatch } from "../../redux/store/store";
 import { toast } from "react-toastify";
-import { logout } from "../redux/authSlice";
-import { fetchCart } from "../redux/cartSlice";
+import { logout } from "../../redux/authSlice";
+import { fetchCart } from "../../redux/cartSlice";
 import { jwtDecode, type JwtPayload } from "jwt-decode";
 
 const Navbar: React.FC = () => {

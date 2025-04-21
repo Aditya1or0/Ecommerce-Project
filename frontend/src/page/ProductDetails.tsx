@@ -67,6 +67,9 @@ const ProductDetails: React.FC = () => {
       }
     }
   };
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" }); // optional fallback
+  }, []);
 
   if (!product) {
     return (

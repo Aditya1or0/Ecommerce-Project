@@ -243,7 +243,7 @@ const Navbar: React.FC = () => {
                     src={
                       userAvatar.startsWith("http")
                         ? userAvatar
-                        : `http://localhost:3000${userAvatar}`
+                        : `https://ecommerce-project-rktn.onrender.com/${userAvatar}`
                     }
                     alt="Profile"
                     className="h-7 w-7 rounded-full object-cover border border-cyan-600"
@@ -272,7 +272,7 @@ const Navbar: React.FC = () => {
                 src={
                   userAvatar.startsWith("http")
                     ? userAvatar
-                    : `http://localhost:3000${userAvatar}`
+                    : `https://ecommerce-project-rktn.onrender.com${userAvatar}`
                 }
                 alt="Profile"
                 className="h-8 w-8 object-cover"

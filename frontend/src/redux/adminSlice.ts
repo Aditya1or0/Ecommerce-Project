@@ -23,7 +23,7 @@ export const createProduct = createAsyncThunk<
 >("admin/createProduct", async (productData, { rejectWithValue }) => {
   try {
     const response = await axios.post(
-      "http://localhost:3000/products",
+      "https://ecommerce-project-rktn.onrender.com/products",
       productData
     );
     return response.data;

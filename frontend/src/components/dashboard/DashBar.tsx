@@ -31,7 +31,7 @@ export default function Dashbar({ user, getInitials, setShowModal }: Props) {
                     src={
                       user.avatar?.startsWith("http")
                         ? user.avatar
-                        : `http://localhost:3000${user.avatar}`
+                        : `https://ecommerce-project-rktn.onrender.com/${user.avatar}`
                     }
                     alt="Profile"
                     className="h-10 w-10 rounded-full object-cover"

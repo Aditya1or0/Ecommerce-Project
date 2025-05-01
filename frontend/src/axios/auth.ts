@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "http://localhost:3000/auth",
+  baseURL: "https://ecommerce-project-rktn.onrender.com/auth",
   timeout: 5000,
 });
 

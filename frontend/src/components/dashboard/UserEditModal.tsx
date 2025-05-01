@@ -87,12 +87,16 @@ const UserEditModal: React.FC<Props> = ({ user, onClose, onUpdate }) => {
       const decoded = jwtDecode<JwtPayload>(token);
       const userId = decoded.sub;
 
-      await axios.patch(`http://localhost:3000/user/${userId}`, form, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      await axios.patch(
+        `https://ecommerce-project-rktn.onrender.com/user/${userId}`,
+        form,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       toast.success("Profile updated successfully!");
       onUpdate(); // Refresh the user data

@@ -9,10 +9,11 @@ import { motion } from "framer-motion";
 // Component imports
 import SearchBar from "../components/products/SearchBar";
 import FilterButtons from "../components/products/FilterButtons";
-import ProductGrid from "../components/products/ProductGrid";
-import ProductCount from "../components/products/ProductCount";
-import Pagination from "../components/products/Pagination";
-import NoResults from "../components/products/NoResults";
+import { lazy, Suspense } from "react";
+
+const ProductGrid = lazy(() => import("../components/products/ProductGrid"));
+const Pagination = lazy(() => import("../components/products/Pagination"));
+// import NoResults from "../components/products/NoResults";
 
 const Products: React.FC = () => {
   const dispatch = useDispatch();
@@ -23,7 +24,7 @@ const Products: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(8);
-  const [totalProducts, setTotalProducts] = useState(0);
+  const [, setTotalProducts] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [_, setIsSearching] = useState(false);
 
@@ -133,14 +134,9 @@ const Products: React.FC = () => {
         setSelectedFilter={setSelectedFilter}
       />
 
-      {products.length > 0 ? (
+      {/* {products.length > 0 ? (
         <>
           <ProductGrid products={products} />
-          {/* <ProductCount
-            currentPage={currentPage}
-            productsPerPage={productsPerPage}
-            totalProducts={totalProducts}
-          /> */}
         </>
       ) : (
         <NoResults />
@@ -152,7 +148,15 @@ const Products: React.FC = () => {
           totalPages={totalPages}
           paginate={paginate}
         />
-      )}
+      )} */}
+      <Suspense fallback={<div>Loading...</div>}>
+        <ProductGrid products={products} />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          paginate={paginate}
+        />
+      </Suspense>
     </motion.div>
   );
 };

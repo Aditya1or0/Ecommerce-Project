@@ -1,4 +1,3 @@
-import React from "react";
 import { Camera, User, Heart } from "lucide-react";
 
 interface Props {

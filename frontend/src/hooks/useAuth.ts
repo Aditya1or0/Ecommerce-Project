@@ -86,7 +86,7 @@ export const useAuthForm = () => {
 
     try {
       if (isLogin) {
-        const result = await dispatch(
+        await dispatch(
           login({ email: formValues.email, password: formValues.password })
         ).unwrap();
         toast.success("Login successful!");

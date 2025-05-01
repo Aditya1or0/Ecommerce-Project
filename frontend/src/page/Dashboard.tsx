@@ -3,10 +3,10 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
+
 import { toast } from "react-toastify";
 import { AnimatePresence, motion } from "framer-motion";
-import { useDispatch } from "react-redux";
+
 import LoadingSpinner from "../components/dashboard/LoadingSpinner";
 import NotLoggedInPrompt from "../components/dashboard/NotLoggedInPrompt";
 import Dashbar from "../components/dashboard/DashBar";
@@ -41,8 +41,6 @@ export default function Dashboard() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const dispatch = useDispatch();
 
   const fetchUserData = useCallback(async () => {
     try {

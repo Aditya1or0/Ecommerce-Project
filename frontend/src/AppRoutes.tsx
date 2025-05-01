@@ -12,6 +12,7 @@ import Login from "./page/Login";
 import Dashboard from "./page/Dashboard";
 import MainLayout from "./MainLayout";
 import OrderPage from "./page/Orders";
+import AdminPanel from "./page/AdminPanel";
 
 const AppRoutes = () => {
   return (
@@ -89,6 +90,14 @@ const AppRoutes = () => {
             <UnprotectedRoute>
               <OrderPage cart={[]} totalAmount={0} />
             </UnprotectedRoute>
+          }
+        />
+        <Route
+          path="/admin-panel"
+          element={
+            <MainLayout>
+              <AdminPanel />
+            </MainLayout>
           }
         />
         <Route

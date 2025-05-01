@@ -80,12 +80,7 @@ const ProductsOnHome: React.FC = () => {
         animate="visible"
       >
         {products.slice(0, 8).map((product, index) => (
-          <motion.div
-            key={product.id || index}
-            variants={itemVariants}
-            // Remove the whileHover and whileTap animations from here
-            className="card-container"
-          >
+          <motion.div key={product.id || index} className="card-container">
             <ProductCard product={product} />
           </motion.div>
         ))}

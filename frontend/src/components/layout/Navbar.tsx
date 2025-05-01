@@ -16,7 +16,6 @@ const Navbar: React.FC = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
 
-  // 🔥 Added state to trigger logout animation
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -103,7 +102,6 @@ const Navbar: React.FC = () => {
     setIsUserMenuOpen(!isUserMenuOpen);
   };
 
-  // 🔥 Updated logout to trigger animation first
   const handleLogoutClick = () => {
     setIsLoggingOut(true);
     setTimeout(() => {
@@ -202,7 +200,6 @@ const Navbar: React.FC = () => {
             </NavLink>
           </li>
 
-          {/* 🔥 Desktop Logout Button with animation */}
           <li>
             {token ? (
               <button
@@ -287,6 +284,19 @@ const Navbar: React.FC = () => {
             )}
           </NavLink>
         )}
+        {/* changes to be add that is its admin then admin panel can view
+        {token && (
+          <NavLink
+            to={"/admin-panel"}
+            className={({ isActive }) =>
+              isActive
+                ? "font-semibold text-sky-600 border-b-2 border-sky-600"
+                : "font-semibold hover:text-sky-600"
+            }
+          >
+            Admin Panel
+          </NavLink>
+        )} */}
         <button
           onClick={toggleMobileMenu}
           className="text-gray-600 focus:outline-none"
@@ -373,7 +383,7 @@ const Navbar: React.FC = () => {
               </NavLink>
             </li>
 
-            {/* 🔥 Mobile Logout Button with animation */}
+            {/*  Mobile Logout Button with animation */}
             <li>
               {token ? (
                 <button

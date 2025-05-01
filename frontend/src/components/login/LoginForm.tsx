@@ -205,6 +205,19 @@ export default function AuthForm({
           </button>
         </p>
       </div>
+
+      {/* Signup with clerk */}
+      <div className="mt-6 text-center">
+        <p className="text-gray-600">
+          <button
+            // onClick={toggleMode}
+            className="text-cyan-600 hover:text-cyan-700 font-medium focus:outline-none"
+            type="button"
+          >
+            Signup with Google
+          </button>
+        </p>
+      </div>
     </div>
   );
 }

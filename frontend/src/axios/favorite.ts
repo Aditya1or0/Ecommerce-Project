@@ -1,6 +1,6 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "https://ecommerce-project-rktn.onrender.com/favorites",
+  baseURL: `${import.meta.env.VITE_BACKEND_URL}/favorites`,
   timeout: 5000,
 });

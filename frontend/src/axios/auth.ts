@@ -1,7 +1,9 @@
 import axios from "axios";
 
+// const backendUrl = import.meta.env.VITE_BACKEND_URL;
+// console.log(backendUrl);
 export const api = axios.create({
-  baseURL: "https://ecommerce-project-rktn.onrender.com/auth",
+  baseURL: `http://localhost:3000/auth`,
   timeout: 5000,
 });
 

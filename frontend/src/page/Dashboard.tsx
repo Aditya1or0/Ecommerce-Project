@@ -129,7 +129,7 @@ export default function Dashboard() {
       formData.append("file", file);
 
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}//user/upload-avatar`,
+        `${import.meta.env.VITE_BACKEND_URL}/user/upload-avatar`,
         formData,
         {
           headers: {

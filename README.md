@@ -5,12 +5,14 @@ ShopiFy is a modern, full-stack eCommerce web application built with a focus on 
 ## Tech Stack
 
 ### Frontend
+
 - **React**: A JavaScript library for building user interfaces.
 - **TypeScript**: A typed superset of JavaScript for improved developer experience and type safety.
 - **Redux**: A predictable state container for managing the global state, used for cart management in this project.
 - **TailwindCSS**: A utility-first CSS framework for styling the app.
 
 ### Backend
+
 - **NestJS**: A progressive Node.js framework for building efficient, scalable server-side applications.
 - **Prisma**: A modern ORM for working with databases in Node.js and TypeScript applications.
 - **PostgreSQL**: A powerful, open-source relational database system.
@@ -25,25 +27,29 @@ ShopiFy is a modern, full-stack eCommerce web application built with a focus on 
 ## Installation
 
 ### Prerequisites
+
 - Node.js (v14+)
 - npm or yarn
 - PostgreSQL (local or remote database)
-  
+
 ### Backend Setup
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/ShopiFy.git
    cd ShopiFy
    ```
 
 2. Install backend dependencies:
+
    ```bash
    cd backend
    npm install
    ```
 
 3. Set up your PostgreSQL database and configure `.env`:
+
    - Create a PostgreSQL database.
    - Add the following environment variables in the `.env` file:
      ```
@@ -52,6 +58,7 @@ ShopiFy is a modern, full-stack eCommerce web application built with a focus on 
      ```
 
 4. Run database migrations:
+
    ```bash
    npx prisma migrate dev
    ```
@@ -64,16 +71,19 @@ ShopiFy is a modern, full-stack eCommerce web application built with a focus on 
 ### Frontend Setup
 
 1. Navigate to the frontend directory:
+
    ```bash
    cd frontend
    ```
 
 2. Install frontend dependencies:
+
    ```bash
    npm install
    ```
 
 3. Configure API base URL in the frontend:
+
    - Create a `.env` file in the `frontend` folder and add:
      ```
      REACT_APP_API_URL=http://localhost:3001

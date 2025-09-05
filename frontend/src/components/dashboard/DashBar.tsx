@@ -9,6 +9,7 @@ interface Props {
   getInitials: () => string;
   setShowModal: (val: boolean) => void;
 }
+console.log(import.meta.env.VITE_BACKEND_URL);
 
 export default function Dashbar({ user, getInitials, setShowModal }: Props) {
   return (
@@ -31,7 +32,7 @@ export default function Dashbar({ user, getInitials, setShowModal }: Props) {
                     src={
                       user.avatar?.startsWith("http")
                         ? user.avatar
-                        : `https://ecommerce-project-rktn.onrender.com/${user.avatar}`
+                        : `${import.meta.env.VITE_BACKEND_URL}/${user.avatar}`
                     }
                     alt="Profile"
                     className="h-10 w-10 rounded-full object-cover"

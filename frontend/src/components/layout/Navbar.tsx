@@ -51,11 +51,14 @@ const Navbar: React.FC = () => {
 
       if (!userId) return;
 
-      const response = await fetch(`http://localhost:3000/user/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/user/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to fetch user data");
 
@@ -243,7 +246,7 @@ const Navbar: React.FC = () => {
                     src={
                       userAvatar.startsWith("http")
                         ? userAvatar
-                        : `https://ecommerce-project-rktn.onrender.com/${userAvatar}`
+                        : `${import.meta.env.VITE_BACKEND_URL}/${userAvatar}`
                     }
                     alt="Profile"
                     className="h-7 w-7 rounded-full object-cover border border-cyan-600"
@@ -272,7 +275,7 @@ const Navbar: React.FC = () => {
                 src={
                   userAvatar.startsWith("http")
                     ? userAvatar
-                    : `https://ecommerce-project-rktn.onrender.com${userAvatar}`
+                    : `${import.meta.env.VITE_BACKEND_URL}/${userAvatar}`
                 }
                 alt="Profile"
                 className="h-8 w-8 object-cover"

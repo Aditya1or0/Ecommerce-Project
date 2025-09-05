@@ -56,11 +56,14 @@ export default function Dashboard() {
       const decoded = jwtDecode<JwtPayload>(token);
       const userId = decoded.sub;
 
-      const response = await axios.get(`http://localhost:3000/user/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/user/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       setUser({
         id: response.data.id,
@@ -126,7 +129,7 @@ export default function Dashboard() {
       formData.append("file", file);
 
       const response = await axios.post(
-        "http://localhost:3000/user/upload-avatar",
+        `${import.meta.env.VITE_BACKEND_URL}/user/upload-avatar`,
         formData,
         {
           headers: {

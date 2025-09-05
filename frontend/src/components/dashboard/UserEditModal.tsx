@@ -88,7 +88,7 @@ const UserEditModal: React.FC<Props> = ({ user, onClose, onUpdate }) => {
       const userId = decoded.sub;
 
       await axios.patch(
-        `https://ecommerce-project-rktn.onrender.com/user/${userId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/user/${userId}`,
         form,
         {
           headers: {

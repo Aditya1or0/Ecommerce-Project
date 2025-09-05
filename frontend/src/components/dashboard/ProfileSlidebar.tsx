@@ -32,7 +32,7 @@ export default function ProfileSidebar({
                   src={
                     user.avatar?.startsWith("http")
                       ? user.avatar
-                      : `http://localhost:3000${user.avatar}`
+                      : `${import.meta.env.VITE_BACKEND_URL}/${user.avatar}`
                   }
                   alt="Profile"
                   className="h-24 w-24 rounded-full object-cover"
